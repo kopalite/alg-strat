@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AlgorithmStrategies
 {
-    public interface IAlgorithmStrategy<TModel>
+    public interface IAlgorithmStrategy<TModel, TResult>
     {
         int Type { get; }
 
@@ -22,10 +22,10 @@ namespace AlgorithmStrategies
 
         bool IsCandidate(TModel model);
 
-        Result Evaluate(TModel model);
+        StrategyResult<TResult> Execute(TModel model);
     }
 
-    public class AlgorithmStrategyBase<TModel> : IAlgorithmStrategy<TModel>
+    public class AlgorithmStrategyBase<TModel, TResult> : IAlgorithmStrategy<TModel, TResult>
     {
         public virtual int Type { get; }
 
@@ -44,9 +44,9 @@ namespace AlgorithmStrategies
             return false;
         }
 
-        public virtual Result Evaluate(TModel model)
+        public virtual StrategyResult<TResult> Execute(TModel model)
         {
-            return Result.Inconclusive;
+            return StrategyResult<TResult>.Inconclusive();
         }
     }
 }

@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="AlgorithmStrategy.cs" />
     <Compile Include="AlgorithmStrategyPerformer.cs" />
-    <Compile Include="Result.cs" />
+    <Compile Include="StrategyResult.cs" />
     <Compile Include="ResultType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
