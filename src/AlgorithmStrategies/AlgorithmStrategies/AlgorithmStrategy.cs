@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AlgorithmStrategies
+﻿namespace AlgorithmStrategies
 {
     public interface IAlgorithmStrategy<TModel, TResult>
     {
@@ -29,7 +23,7 @@ namespace AlgorithmStrategies
     {
         public virtual int Type { get; }
 
-        public string Name { get; }
+        public virtual string Name { get; }
 
         public virtual int Id { get; }
 

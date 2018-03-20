@@ -38,7 +38,7 @@ namespace AlgorithmStrategies
 
         private StrategyResult<TResult> ByPriority(TModel model, List<IAlgorithmStrategy<TModel, TResult>> strategies, int strategyId)
         {
-            strategies = strategies.OrderByDescending(x => x.Priority).ToList();
+            strategies = strategies.OrderBy(x => x.Priority).ToList();
 
             var result = StrategyResult<TResult>.Inconclusive();
             IAlgorithmStrategy<TModel, TResult> strategy = null;
@@ -51,6 +51,7 @@ namespace AlgorithmStrategies
                     if (strategy.IsCandidate(model))
                     {
                         result = strategy.Execute(model);
+                        result.StrategyName = strategy.Name;
                     }
                     strategies.Remove(strategy);
                     strategyId = strategy.NextId;

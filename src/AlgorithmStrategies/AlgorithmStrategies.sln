@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmStrategies", "AlgorithmStrategies\AlgorithmStrategies.csproj", "{0F6BF4CA-A703-4840-AF3F-8EA632F56A63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmStrategies.Test", "AlgorithmStrategies.Test\AlgorithmStrategies.Test.csproj", "{627C9666-D01D-43B3-8734-6CC7C99EF0FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{0F6BF4CA-A703-4840-AF3F-8EA632F56A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F6BF4CA-A703-4840-AF3F-8EA632F56A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F6BF4CA-A703-4840-AF3F-8EA632F56A63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{627C9666-D01D-43B3-8734-6CC7C99EF0FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{627C9666-D01D-43B3-8734-6CC7C99EF0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{627C9666-D01D-43B3-8734-6CC7C99EF0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{627C9666-D01D-43B3-8734-6CC7C99EF0FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
