@@ -35,12 +35,7 @@
         public bool IsFailure { get { return ResultType == ResultType.Failure; } }
 
         public bool IsInconclusive { get { return ResultType == ResultType.Inconclusive; } }
-
-        public static StrategyResult<TResult> Inconclusive(TResult result = default(TResult))
-        {
-            return new StrategyResult<TResult>(ResultType.Inconclusive, result); 
-        }
-
+       
         public static StrategyResult<TResult> Success(TResult result = default(TResult))
         {
             return new StrategyResult<TResult>(ResultType.Success, result);
@@ -51,7 +46,11 @@
             return new StrategyResult<TResult>(ResultType.Failure, result);
         }
 
-        
+        public static StrategyResult<TResult> Inconclusive(TResult result = default(TResult))
+        {
+            return new StrategyResult<TResult>(ResultType.Inconclusive, result);
+        }
+
     }
 
 }
