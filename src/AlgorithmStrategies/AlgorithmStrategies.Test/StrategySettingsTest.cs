@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Diagnostics;
 
 namespace AlgorithmStrategies.Test
 {
@@ -65,10 +66,13 @@ namespace AlgorithmStrategies.Test
                                                                         Priority = 20000,
                                                                         TerminationType = TerminationType.TerminateOnSuccess
                                                                     },
-                                                                });
+                                                                }).ToArray();
+
+
+            Debugger.NotifyOfCrossThreadDependency();
 
             //Assert
-            Assert.IsTrue(strategies.Count() == 2 && strategies.First().NextId == 777 && strategies.Last().NextId == 888);
+            Assert.IsTrue(strategies.Count() == 2 && strategies[0].NextId == 888 && strategies[1].NextId == 777);
         }
     }
 }
