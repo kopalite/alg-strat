@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlgorithmStrategy.cs" />
-    <Compile Include="AlgorithmStrategyPerformer.cs" />
+    <Compile Include="RuntimeStrategy.cs" />
+    <Compile Include="StrategyBase.cs" />
+    <Compile Include="StrategyExecutor.cs" />
     <Compile Include="StrategyResult.cs" />
     <Compile Include="ResultType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StrategySettings.cs" />
     <Compile Include="TerminationType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

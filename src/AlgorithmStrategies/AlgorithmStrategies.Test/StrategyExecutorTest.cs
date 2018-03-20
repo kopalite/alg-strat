@@ -6,10 +6,10 @@ using System.Linq;
 namespace AlgorithmStrategies.Test
 {
     [TestClass]
-    public class AlgorithmStrategiesPerformerTest
+    public class StrategyExecutorTest
     {
         private IAlgorithmStrategy<UserModel, bool>[] _strategies;
-        private IAlgorithmStrategyPerformer<UserModel, bool> _performer;
+        private IStrategyExecutor<UserModel, bool> _executor;
 
         [TestInitialize]
         public void Initialize()
@@ -20,171 +20,171 @@ namespace AlgorithmStrategies.Test
                 new IsNameUnderscoredStrategy(),
                 new IsDoctorStrategy()
             };
-            _performer = new AlgorithmStrategyPerformer<UserModel, bool>(_strategies);
+            _executor = new StrategyExecutor<UserModel, bool>(_strategies);
         }
 
         [TestMethod]
-        public void ByPriority_Success()
+        public void Execute_Success()
         {
             //Arrange
             var userModel = new UserModel { Category = "Doctors" };
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
         }
 
         [TestMethod]
-        public void ByPriority_Failure()
+        public void Execute_Failure()
         {
             //Arrange
             var userModel = new UserModel { Category = "Nurses" };
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(!result.Result && result.IsFailure && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
         }
 
         [TestMethod]
-        public void ByPriority_Inconclusive()
+        public void Execute_Inconclusive()
         {
             //Arrange
             var userModel = new UserModel();
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(result.IsInconclusive && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
         }
 
         [TestMethod]
-        public void ByPriority_Success_Terminating()
+        public void Execute_Success_Terminating()
         {
             //Arrange
             var userModel = new UserModel { Name = "_John Smith" };
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
         }
 
         [TestMethod]
-        public void ByPriority_Failure_Terminating()
+        public void Execute_Failure_Terminating()
         {
             //Arrange
             var userModel = new UserModel { Name = "John Smith" };
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(!result.Result && result.IsFailure && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
         }
 
         [TestMethod]
-        public void ByPriority_Inconclusive_Terminating()
+        public void Execute_Inconclusive_Terminating()
         {
             //Arrange
             var userModel = new UserModel();
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(!result.Result && result.IsInconclusive && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
         }
 
         [TestMethod]
-        public void ByPriority_StrategyId_Single()
+        public void Execute_StrategyId_Single()
         {
             //Arrange
             var userModel = new UserModel { Category = "Doctors" };
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0, 333);
+            var result = _executor.Execute(userModel, 0, 333);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsDoctor");
         }
 
         [TestMethod]
-        public void ByPriority_StrategyId_Chain()
+        public void Execute_StrategyId_Chain()
         {
             //Arrange
             var userModel = new UserModel { Category = "Doctors" };
             _strategies[1] = new IsNameUnderscoredChainedStrategy();
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0, 222);
+            var result = _executor.Execute(userModel, 0, 222);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredChained;IsDoctor");
         }
 
         [TestMethod]
-        public void ByPriority_Mix()
+        public void Execute_Mix()
         {
             //Arrange
             var userModel = new UserModel { Name = "_John Smith" };
             _strategies[0] = new IsNameUnderscoredAndDoctorChainedStrategy();
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
             _strategies = _strategies.Union(new [] { new DefaultStrategy() }).ToArray();
-            _performer = new AlgorithmStrategyPerformer<UserModel, bool>(_strategies);
+            _executor = new StrategyExecutor<UserModel, bool>(_strategies);
 
             //Act 
-            var result = _performer.ByPriority(userModel, 0);
+            var result = _executor.Execute(userModel, 0);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredAndDoctorChained;IsDoctor;Default");
         }
 
         [TestMethod]
-        public void ByPriority_TerminationType_Always()
+        public void Execute_TerminationType_Always()
         {
             //Arrange
             var strategies = new[] { new DefaultTerminateAlwaysStrategy() }.Union(_strategies);
-            var performer = new AlgorithmStrategyPerformer<UserModel, bool>(strategies);
+            var executor = new StrategyExecutor<UserModel, bool>(strategies);
 
             //Act
-            var result = performer.ByPriority(new UserModel(), 0);
+            var result = executor.Execute(new UserModel(), 0);
 
             //Assert
             Assert.IsTrue(result.History == "DefaultTerminateAlways");
         }
 
         [TestMethod]
-        public void ByPriority_TerminationType_OnFailure()
+        public void Execute_TerminationType_OnFailure()
         {
             //Arrange
             var strategies = new[] { new DefaultTerminateOnFailureStrategy() }.Union(_strategies);
-            var performer = new AlgorithmStrategyPerformer<UserModel, bool>(strategies);
+            var executor = new StrategyExecutor<UserModel, bool>(strategies);
 
             //Act
-            var result = performer.ByPriority(new UserModel(), 0);
+            var result = executor.Execute(new UserModel(), 0);
 
             //Assert
             Assert.IsTrue(result.IsFailure && result.History == "DefaultTerminateOnFailure");
         }
 
         [TestMethod]
-        public void ByPriority_TerminationType_OnSuccess()
+        public void Execute_TerminationType_OnSuccess()
         {
             //Arrange
             var strategies = new[] { new DefaultTerminateOnSuccessStrategy() }.Union(_strategies);
-            var performer = new AlgorithmStrategyPerformer<UserModel, bool>(strategies);
+            var executor = new StrategyExecutor<UserModel, bool>(strategies);
 
             //Act
-            var result = performer.ByPriority(new UserModel(), 0);
+            var result = executor.Execute(new UserModel(), 0);
 
             //Assert
             Assert.IsTrue(result.IsSuccess && result.History == "DefaultTerminateOnSuccess");
@@ -198,7 +198,7 @@ namespace AlgorithmStrategies.Test
         public string Category { get; set; }
     }
 
-    public class IsNameUnderscoredAndDoctorStrategy : AlgorithmStrategyBase<UserModel, bool>
+    public class IsNameUnderscoredAndDoctorStrategy : StrategyBase<UserModel, bool>
     {
         public override int Id { get { return 111; } }
         public override int Priority { get { return 10; } }
@@ -221,7 +221,7 @@ namespace AlgorithmStrategies.Test
         public override int NextId { get { return 333; } }
     }
 
-    public class IsNameUnderscoredStrategy : AlgorithmStrategyBase<UserModel, bool>
+    public class IsNameUnderscoredStrategy : StrategyBase<UserModel, bool>
     {
         public override int Id { get { return 222; } }
         public override int Priority { get { return 20; } }
@@ -250,7 +250,7 @@ namespace AlgorithmStrategies.Test
         public override int NextId { get { return 333; } }
     }
 
-    public class IsDoctorStrategy : AlgorithmStrategyBase<UserModel, bool>
+    public class IsDoctorStrategy : StrategyBase<UserModel, bool>
     {
         public override int Id { get { return 333; } }
         public override int Priority { get { return 30; } }
@@ -267,7 +267,7 @@ namespace AlgorithmStrategies.Test
         }
     }
 
-    public class DefaultStrategy : AlgorithmStrategyBase<UserModel, bool>
+    public class DefaultStrategy : StrategyBase<UserModel, bool>
     {
         public override int Id { get { return 444; } }
         public override int Priority { get { return 40; } }
@@ -280,6 +280,12 @@ namespace AlgorithmStrategies.Test
         {
             return StrategyResult<bool>.Success(true);
         }
+    }
+
+    public class SetableStrategy : StrategyBase<UserModel, bool>
+    {
+        public override int Id { get { return 10000; } }
+        public override string Name { get { return "Default"; } }
     }
 
     public class DefaultTerminateAlwaysStrategy : DefaultStrategy
