@@ -12,11 +12,13 @@
 
         int Priority { get; }
 
-        bool IsTerminating { get; }
+        TerminationType TerminationType { get; }
 
         bool IsCandidate(TModel model);
-
+        
         StrategyResult<TResult> Execute(TModel model);
+
+        bool IsTermination(StrategyResult<TResult> result);
     }
 
     public class AlgorithmStrategyBase<TModel, TResult> : IAlgorithmStrategy<TModel, TResult>
@@ -31,7 +33,7 @@
 
         public virtual int Priority { get; }
 
-        public virtual bool IsTerminating { get; }
+        public virtual TerminationType TerminationType { get; }
 
         public virtual bool IsCandidate(TModel model)
         {
@@ -41,6 +43,13 @@
         public virtual StrategyResult<TResult> Execute(TModel model)
         {
             return StrategyResult<TResult>.Inconclusive();
+        }
+
+        public bool IsTermination(StrategyResult<TResult> result)
+        {
+            return this.TerminationType == TerminationType.TerminateAlways ||
+                   this.TerminationType == TerminationType.TerminateOnFailure && result.IsFailure ||
+                   this.TerminationType == TerminationType.TerminateOnSuccess && result.IsSuccess;
         }
     }
 }

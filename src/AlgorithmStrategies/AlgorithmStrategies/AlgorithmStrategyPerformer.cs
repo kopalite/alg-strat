@@ -9,10 +9,6 @@ namespace AlgorithmStrategies
         StrategyResult<TResult> ByPriority(TModel model, int strategyType);
 
         StrategyResult<TResult> ByPriority(TModel model, int strategyType, int strategyId);
-
-        StrategyResult<TResult> ByAlgorithm(TModel model, int strategyType);
-
-        StrategyResult<TResult> ByAlgorithm(TModel model, int strategyType, int strategyId);
     }
 
     public class AlgorithmStrategyPerformer<TModel, TResult> : IAlgorithmStrategyPerformer<TModel, TResult>
@@ -50,27 +46,17 @@ namespace AlgorithmStrategies
                 { 
                     if (strategy.IsCandidate(model))
                     {
-                        result = strategy.Execute(model);
-                        result.StrategyName = strategy.Name;
+                        result.Sync(strategy.Execute(model));
                     }
-                    strategies.Remove(strategy);
+
+                    result.Log(strategy.Name);
+                    strategies.RemoveAll(s => s.Priority <= strategy.Priority);
                     strategyId = strategy.NextId;
                 }
             }
-            while (result != StrategyResult<TResult>.Success() && strategy != null && !strategy.IsTerminating);
+            while (strategy != null && !strategy.IsTermination(result));
 
             return result;
-        }
-
-        
-        public StrategyResult<TResult> ByAlgorithm(TModel model, int strategyType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public StrategyResult<TResult> ByAlgorithm(TModel model, int strategyType, int strategyId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

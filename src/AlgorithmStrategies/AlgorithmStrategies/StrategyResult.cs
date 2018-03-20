@@ -2,11 +2,11 @@
 {
     public class StrategyResult<TResult>
     {
-        public TResult Result { get; }
+        public ResultType ResultType { get; private set; }
 
-        public ResultType ResultType { get; }
+        public TResult Result { get; private set; }
 
-        public string StrategyName { get; internal set; }
+        public string History { get; private set; }
 
         private StrategyResult(ResultType resultType) : this(resultType, default(TResult))
         {
@@ -18,6 +18,23 @@
             ResultType = resultType;
             Result = result;
         }
+
+        public void Sync(StrategyResult<TResult> result)
+        {
+            ResultType = result.ResultType;
+            Result = result.Result;
+        }
+
+        public void Log(string strategyName)
+        {
+            History = ((History ?? "") + ";" + strategyName).Trim(';'); 
+        }
+
+        public bool IsSuccess { get { return ResultType == ResultType.Success; } }
+
+        public bool IsFailure { get { return ResultType == ResultType.Failure; } }
+
+        public bool IsInconclusive { get { return ResultType == ResultType.Inconclusive; } }
 
         public static StrategyResult<TResult> Inconclusive(TResult result = default(TResult))
         {
@@ -34,20 +51,7 @@
             return new StrategyResult<TResult>(ResultType.Failure, result);
         }
 
-        public override bool Equals(object obj)
-        {
-            var result = obj as StrategyResult<TResult>;
-            if (result == null)
-            {
-                return false;
-            } 
-            return result.ResultType == ResultType;
-        }
-
-        public override int GetHashCode()
-        {
-            return -1373938868 + ResultType.GetHashCode();
-        }
+        
     }
 
 }
