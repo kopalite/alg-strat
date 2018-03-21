@@ -40,14 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="[Enums].cs" />
+    <Compile Include="IAlgorithmStrategy.cs" />
+    <Compile Include="IStrategyExecutor.cs" />
+    <Compile Include="IStrategySettings.cs" />
     <Compile Include="RuntimeStrategy.cs" />
-    <Compile Include="StrategyBase.cs" />
+    <Compile Include="AlgorithmStrategy.cs" />
     <Compile Include="StrategyExecutor.cs" />
+    <Compile Include="StrategyExtensions.cs" />
     <Compile Include="StrategyResult.cs" />
-    <Compile Include="ResultType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StrategySettings.cs" />
-    <Compile Include="TerminationType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

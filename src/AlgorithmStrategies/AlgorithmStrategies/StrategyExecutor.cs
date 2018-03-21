@@ -4,14 +4,7 @@ using System.Linq;
 
 namespace AlgorithmStrategies
 {
-    public interface IStrategyExecutor<TModel, TResult>
-    {
-        StrategyResult<TResult> Execute(TModel model, int strategyType);
-
-        StrategyResult<TResult> Execute(TModel model, int strategyType, int strategyId);
-    }
-
-    public class StrategyExecutor<TModel, TResult> : IStrategyExecutor<TModel, TResult>
+    public sealed class StrategyExecutor<TModel, TResult> : IStrategyExecutor<TModel, TResult>
     {
         private readonly IEnumerable<IAlgorithmStrategy<TModel, TResult>> _strategies;
 
@@ -20,15 +13,15 @@ namespace AlgorithmStrategies
             _strategies = strategies;
         }
 
-        public StrategyResult<TResult> Execute(TModel model, int strategyType)
+        public StrategyResult<TResult> Execute(TModel model)
         {
-            var strategies = _strategies.Where(x => x.Type == strategyType).ToList();
+            var strategies = _strategies.Where(x => x.IsActive).ToList();
             return ByPriority(model, strategies, 0);
         }
 
-        public StrategyResult<TResult> Execute(TModel model, int strategyType, int strategyId)
+        public StrategyResult<TResult> Execute(TModel model, int strategyId)
         {
-            var strategies = _strategies.Where(x => x.Type == strategyType).ToList();
+            var strategies = _strategies.Where(x => x.IsActive).ToList();
             return ByPriority(model, strategies, strategyId);
         }
 

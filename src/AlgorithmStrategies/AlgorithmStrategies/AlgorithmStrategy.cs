@@ -3,34 +3,18 @@ using System.Threading;
 
 namespace AlgorithmStrategies
 {
-    public interface IAlgorithmStrategy<TModel, TResult> : IStrategySettings
+    public abstract class AlgorithmStrategy<TModel, TResult> : IAlgorithmStrategy<TModel, TResult>
     {
-        int Id { get; }
-
-        string Name { get; }
-
-        void Set(StrategySettings settings);
-
-        bool IsCandidate(TModel model);
-        
-        StrategyResult<TResult> Execute(TModel model);
-
-        bool IsTermination(StrategyResult<TResult> result);
-    }
-
-    public abstract class StrategyBase<TModel, TResult> : IAlgorithmStrategy<TModel, TResult>
-    {
-        private StrategySettings _settings;
-        private Lazy<StrategySettings> _settingsLazy;
+        private IStrategySettings _settings;
+        private Lazy<IStrategySettings> _settingsLazy;
 
         public abstract int Id { get; }
 
         public abstract string Name { get; }
         
-        public virtual int Type
+        public virtual bool IsActive
         {
-            get { return _settingsLazy.Value.Type; }
-            private set { _settingsLazy.Value.Type = value; }
+            get; set;
         }
 
         public virtual int NextId
@@ -51,23 +35,25 @@ namespace AlgorithmStrategies
             private set { _settingsLazy.Value.TerminationType = value; }
         }
 
-        public void Set(StrategySettings settings)
+        public void Set(IStrategySettings settings)
         {
-            _settings = settings.Clone();
+            if (settings == null || settings.ForId != Id)
+            {
+                throw new Exception("Settings requirements: settings != null && settings.ForId == strategy.Id");
+            }
+            _settings = settings;
         }
 
-        public void Set(int type, int nextId, int priority, TerminationType terminationType)
+        public void Set(int nextId, int priority, TerminationType terminationType)
         {
-
-            Type = type;
             NextId = nextId;
             Priority = priority;
             TerminationType = terminationType;
         }
 
-        public StrategyBase()
+        public AlgorithmStrategy()
         {
-            _settingsLazy = new Lazy<StrategySettings>(() =>
+            _settingsLazy = new Lazy<IStrategySettings>(() =>
             {
                 if (_settings == null)
                 {
@@ -89,9 +75,10 @@ namespace AlgorithmStrategies
 
         public bool IsTermination(StrategyResult<TResult> result)
         {
-            return TerminationType == TerminationType.TerminateAlways ||
-                   TerminationType == TerminationType.TerminateOnFailure && result.IsFailure ||
-                   TerminationType == TerminationType.TerminateOnSuccess && result.IsSuccess;
+            return !(TerminationType == TerminationType.Never) &&
+                   (TerminationType == TerminationType.Always ||
+                    TerminationType == TerminationType.OnFailure && result.IsFailure ||
+                    TerminationType == TerminationType.OnSuccess && result.IsSuccess);
         }
     }
 }

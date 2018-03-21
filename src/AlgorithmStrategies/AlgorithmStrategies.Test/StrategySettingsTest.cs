@@ -15,14 +15,14 @@ namespace AlgorithmStrategies.Test
             var strategy = new SetableStrategy();
 
             //Act
-            strategy.Set(1, 2, 3, TerminationType.TerminateOnFailure);
+            strategy.Set(2, 3, TerminationType.OnFailure);
 
             //Assert
-            Assert.IsTrue(strategy.Type == 1 && strategy.NextId == 2 && strategy.Priority == 3 && strategy.TerminationType == TerminationType.TerminateOnFailure);
+            Assert.IsTrue(strategy.NextId == 2 && strategy.Priority == 3 && strategy.TerminationType == TerminationType.OnFailure);
         }
 
         [TestMethod]
-        public void Strategy_Settings_FromConfig()
+        public void Strategy_Settings_FromConfig_Success()
         {
             //Arrange
             var strategy = new SetableStrategy();
@@ -30,14 +30,33 @@ namespace AlgorithmStrategies.Test
             //Act
             strategy.Set(new StrategySettings
             {
-                Type = 1,
+                ForId = 10000,
                 NextId = 2,
                 Priority = 3,
-                TerminationType = TerminationType.TerminateOnFailure
+                TerminationType = TerminationType.OnFailure
             });
 
             //Assert
-            Assert.IsTrue(strategy.Type == 1 && strategy.NextId == 2 && strategy.Priority == 3 && strategy.TerminationType == TerminationType.TerminateOnFailure);
+            Assert.IsTrue(strategy.NextId == 2 && strategy.Priority == 3 && strategy.TerminationType == TerminationType.OnFailure);
+        }
+
+        [TestMethod, ExpectedException(typeof(Exception))]
+        public void Strategy_Settings_FromConfig_Fail()
+        {
+            //Arrange
+            var strategy = new SetableStrategy();
+
+            //Act
+            strategy.Set(new StrategySettings
+            {
+                ForId = 4444444,
+                NextId = 2,
+                Priority = 3,
+                TerminationType = TerminationType.OnFailure
+            });
+
+            //Assert
+            Assert.IsTrue(strategy.NextId == 2 && strategy.Priority == 3 && strategy.TerminationType == TerminationType.OnFailure);
         }
 
         [TestMethod]
@@ -50,21 +69,19 @@ namespace AlgorithmStrategies.Test
                                                                     x => StrategyResult<string>.Failure("r1"))
                                                                 .Set(new[] 
                                                                 {
-                                                                    new ConfigSettings
+                                                                    new StrategySettings
                                                                     {
                                                                         ForId = 1,
-                                                                        Type = 100,
                                                                         NextId = 777,
                                                                         Priority = 10000,
-                                                                        TerminationType = TerminationType.TerminateOnFailure
+                                                                        TerminationType = TerminationType.OnFailure
                                                                     },
-                                                                    new ConfigSettings
+                                                                    new StrategySettings
                                                                     {
                                                                         ForId = 2,
-                                                                        Type = 200,
                                                                         NextId = 888,
                                                                         Priority = 20000,
-                                                                        TerminationType = TerminationType.TerminateOnSuccess
+                                                                        TerminationType = TerminationType.OnSuccess
                                                                     },
                                                                 }).ToArray();
 

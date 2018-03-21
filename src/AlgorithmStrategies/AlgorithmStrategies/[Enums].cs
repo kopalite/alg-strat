@@ -6,4 +6,12 @@
         Success,
         Failure
     }
+
+    public enum TerminationType
+    {
+        Never = 0,
+        OnSuccess,
+        OnFailure,
+        Always
+    }
 }

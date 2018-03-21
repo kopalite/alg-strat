@@ -8,18 +8,18 @@ namespace AlgorithmStrategies.Test
     [TestClass]
     public class StrategyExecutorTest
     {
-        private IAlgorithmStrategy<UserModel, bool>[] _strategies;
+        private List<IAlgorithmStrategy<UserModel, bool>> _strategies;
         private IStrategyExecutor<UserModel, bool> _executor;
 
         [TestInitialize]
         public void Initialize()
         {
-            _strategies = new IAlgorithmStrategy<UserModel, bool>[]
+            _strategies = new List<IAlgorithmStrategy<UserModel, bool>>()
             {
                 new IsNameUnderscoredAndDoctorStrategy(),
                 new IsNameUnderscoredStrategy(),
                 new IsDoctorStrategy()
-            };
+            }.Activate().ToList();
             _executor = new StrategyExecutor<UserModel, bool>(_strategies);
         }
 
@@ -68,6 +68,7 @@ namespace AlgorithmStrategies.Test
             //Arrange
             var userModel = new UserModel { Name = "_John Smith" };
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
+            _strategies.Activate();
 
             //Act 
             var result = _executor.Execute(userModel, 0);
@@ -82,6 +83,7 @@ namespace AlgorithmStrategies.Test
             //Arrange
             var userModel = new UserModel { Name = "John Smith" };
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
+            _strategies.Activate();
 
             //Act 
             var result = _executor.Execute(userModel, 0);
@@ -96,6 +98,7 @@ namespace AlgorithmStrategies.Test
             //Arrange
             var userModel = new UserModel();
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
+            _strategies.Activate();
 
             //Act 
             var result = _executor.Execute(userModel, 0);
@@ -111,7 +114,7 @@ namespace AlgorithmStrategies.Test
             var userModel = new UserModel { Category = "Doctors" };
 
             //Act 
-            var result = _executor.Execute(userModel, 0, 333);
+            var result = _executor.Execute(userModel, 333);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsDoctor");
@@ -123,9 +126,10 @@ namespace AlgorithmStrategies.Test
             //Arrange
             var userModel = new UserModel { Category = "Doctors" };
             _strategies[1] = new IsNameUnderscoredChainedStrategy();
+            _strategies.Activate();
 
             //Act 
-            var result = _executor.Execute(userModel, 0, 222);
+            var result = _executor.Execute(userModel, 222);
 
             //Assert
             Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredChained;IsDoctor");
@@ -138,7 +142,8 @@ namespace AlgorithmStrategies.Test
             var userModel = new UserModel { Name = "_John Smith" };
             _strategies[0] = new IsNameUnderscoredAndDoctorChainedStrategy();
             _strategies[1] = new IsNameUnderscoredTerminatingStrategy();
-            _strategies = _strategies.Union(new [] { new DefaultStrategy() }).ToArray();
+            _strategies.Add(new DefaultStrategy());
+            _strategies.Activate();
             _executor = new StrategyExecutor<UserModel, bool>(_strategies);
 
             //Act 
@@ -149,11 +154,57 @@ namespace AlgorithmStrategies.Test
         }
 
         [TestMethod]
+        public void Execute_TerminationType_NeverAndSuccess()
+        {
+            //Arrange
+            var strategies = new IAlgorithmStrategy<UserModel, bool>[] { new DefaultTerminateNeverSuccessStrategy(), new DefaultTerminateAlwaysStrategy() };
+            strategies.Activate();
+            var executor = new StrategyExecutor<UserModel, bool>(strategies);
+
+            //Act
+            var result = executor.Execute(new UserModel(), 0);
+
+            //Assert
+            Assert.IsTrue(result.History == "DefaultTerminateNeverSuccess;DefaultTerminateAlways");
+        }
+
+        [TestMethod]
+        public void Execute_TerminationType_NeverAndFailure()
+        {
+            //Arrange
+            var strategies = new IAlgorithmStrategy<UserModel, bool>[] { new DefaultTerminateNeverFailureStrategy(), new DefaultTerminateAlwaysStrategy() };
+            strategies.Activate();
+            var executor = new StrategyExecutor<UserModel, bool>(strategies);
+
+            //Act
+            var result = executor.Execute(new UserModel(), 0);
+
+            //Assert
+            Assert.IsTrue(result.History == "DefaultTerminateNeverFailure;DefaultTerminateAlways");
+        }
+
+        [TestMethod]
+        public void Execute_TerminationType_NeverAndInconclusive()
+        {
+            //Arrange
+            var strategies = new IAlgorithmStrategy<UserModel, bool>[] { new DefaultTerminateNeverInconclusiveStrategy(), new DefaultTerminateAlwaysStrategy() };
+            strategies.Activate();
+            var executor = new StrategyExecutor<UserModel, bool>(strategies);
+
+            //Act
+            var result = executor.Execute(new UserModel(), 0);
+
+            //Assert
+            Assert.IsTrue(result.History == "DefaultTerminateNeverInconclusive;DefaultTerminateAlways");
+        }
+
+        [TestMethod]
         public void Execute_TerminationType_Always()
         {
             //Arrange
             var strategies = new[] { new DefaultTerminateAlwaysStrategy() }.Union(_strategies);
             var executor = new StrategyExecutor<UserModel, bool>(strategies);
+            strategies.Activate();
 
             //Act
             var result = executor.Execute(new UserModel(), 0);
@@ -168,6 +219,7 @@ namespace AlgorithmStrategies.Test
             //Arrange
             var strategies = new[] { new DefaultTerminateOnFailureStrategy() }.Union(_strategies);
             var executor = new StrategyExecutor<UserModel, bool>(strategies);
+            strategies.Activate();
 
             //Act
             var result = executor.Execute(new UserModel(), 0);
@@ -181,6 +233,7 @@ namespace AlgorithmStrategies.Test
         {
             //Arrange
             var strategies = new[] { new DefaultTerminateOnSuccessStrategy() }.Union(_strategies);
+            strategies.Activate();
             var executor = new StrategyExecutor<UserModel, bool>(strategies);
 
             //Act
@@ -198,7 +251,7 @@ namespace AlgorithmStrategies.Test
         public string Category { get; set; }
     }
 
-    public class IsNameUnderscoredAndDoctorStrategy : StrategyBase<UserModel, bool>
+    public class IsNameUnderscoredAndDoctorStrategy : AlgorithmStrategy<UserModel, bool>
     {
         public override int Id { get { return 111; } }
         public override int Priority { get { return 10; } }
@@ -221,7 +274,7 @@ namespace AlgorithmStrategies.Test
         public override int NextId { get { return 333; } }
     }
 
-    public class IsNameUnderscoredStrategy : StrategyBase<UserModel, bool>
+    public class IsNameUnderscoredStrategy : AlgorithmStrategy<UserModel, bool>
     {
         public override int Id { get { return 222; } }
         public override int Priority { get { return 20; } }
@@ -241,7 +294,7 @@ namespace AlgorithmStrategies.Test
     public class IsNameUnderscoredTerminatingStrategy : IsNameUnderscoredStrategy
     {
         public override string Name { get { return "IsNameUnderscoredTerminating"; } }
-        public override TerminationType TerminationType { get { return TerminationType.TerminateAlways; } }
+        public override TerminationType TerminationType { get { return TerminationType.Always; } }
     }
 
     public class IsNameUnderscoredChainedStrategy : IsNameUnderscoredStrategy
@@ -250,7 +303,7 @@ namespace AlgorithmStrategies.Test
         public override int NextId { get { return 333; } }
     }
 
-    public class IsDoctorStrategy : StrategyBase<UserModel, bool>
+    public class IsDoctorStrategy : AlgorithmStrategy<UserModel, bool>
     {
         public override int Id { get { return 333; } }
         public override int Priority { get { return 30; } }
@@ -267,7 +320,7 @@ namespace AlgorithmStrategies.Test
         }
     }
 
-    public class DefaultStrategy : StrategyBase<UserModel, bool>
+    public class DefaultStrategy : AlgorithmStrategy<UserModel, bool>
     {
         public override int Id { get { return 444; } }
         public override int Priority { get { return 40; } }
@@ -282,24 +335,57 @@ namespace AlgorithmStrategies.Test
         }
     }
 
-    public class SetableStrategy : StrategyBase<UserModel, bool>
+    public class SetableStrategy : AlgorithmStrategy<UserModel, bool>
     {
         public override int Id { get { return 10000; } }
         public override string Name { get { return "Default"; } }
     }
 
-    public class DefaultTerminateAlwaysStrategy : DefaultStrategy
+    public class DefaultTerminateNeverSuccessStrategy : DefaultStrategy
     {
         public override int Priority { get { return 1; } }
+        public override string Name { get { return "DefaultTerminateNeverSuccess"; } }
+        public override TerminationType TerminationType { get { return TerminationType.Never; } }
+        public override StrategyResult<bool> Execute(UserModel model)
+        {
+            return StrategyResult<bool>.Success();
+        }
+    }
+
+    public class DefaultTerminateNeverFailureStrategy : DefaultStrategy
+    {
+        public override int Priority { get { return 1; } }
+        public override string Name { get { return "DefaultTerminateNeverFailure"; } }
+        public override TerminationType TerminationType { get { return TerminationType.Never; } }
+        public override StrategyResult<bool> Execute(UserModel model)
+        {
+            return StrategyResult<bool>.Failure();
+        }
+    }
+
+    public class DefaultTerminateNeverInconclusiveStrategy : DefaultStrategy
+    {
+        public override int Priority { get { return 1; } }
+        public override string Name { get { return "DefaultTerminateNeverInconclusive"; } }
+        public override TerminationType TerminationType { get { return TerminationType.Never; } }
+        public override StrategyResult<bool> Execute(UserModel model)
+        {
+            return StrategyResult<bool>.Inconclusive();
+        }
+    }
+
+    public class DefaultTerminateAlwaysStrategy : DefaultStrategy
+    {
+        public override int Priority { get { return 2; } }
         public override string Name { get { return "DefaultTerminateAlways"; } }
-        public override TerminationType TerminationType { get { return TerminationType.TerminateAlways; } }
+        public override TerminationType TerminationType { get { return TerminationType.Always; } }
     }
 
     public class DefaultTerminateOnFailureStrategy : DefaultStrategy
     {
-        public override int Priority { get { return 1; } }
+        public override int Priority { get { return 2; } }
         public override string Name { get { return "DefaultTerminateOnFailure"; } }
-        public override TerminationType TerminationType { get { return TerminationType.TerminateOnFailure; } }
+        public override TerminationType TerminationType { get { return TerminationType.OnFailure; } }
         public override StrategyResult<bool> Execute(UserModel model)
         {
             return StrategyResult<bool>.Failure();
@@ -308,9 +394,9 @@ namespace AlgorithmStrategies.Test
 
     public class DefaultTerminateOnSuccessStrategy : DefaultStrategy
     {
-        public override int Priority { get { return 1; } }
+        public override int Priority { get { return 2; } }
         public override string Name { get { return "DefaultTerminateOnSuccess"; } }
-        public override TerminationType TerminationType { get { return TerminationType.TerminateOnSuccess; } }
+        public override TerminationType TerminationType { get { return TerminationType.OnSuccess; } }
         public override StrategyResult<bool> Execute(UserModel model)
         {
             return StrategyResult<bool>.Success();
