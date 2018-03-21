@@ -35,6 +35,18 @@ namespace AlgorithmStrategies
             private set { _settingsLazy.Value.TerminationType = value; }
         }
 
+        public AlgorithmStrategy()
+        {
+            _settingsLazy = new Lazy<IStrategySettings>(() =>
+            {
+                if (_settings == null)
+                {
+                    _settings = new StrategySettings();
+                }
+                return _settings;
+            });
+        }
+
         public void Set(IStrategySettings settings)
         {
             if (settings == null || settings.ForId != Id)
@@ -49,18 +61,6 @@ namespace AlgorithmStrategies
             NextId = nextId;
             Priority = priority;
             TerminationType = terminationType;
-        }
-
-        public AlgorithmStrategy()
-        {
-            _settingsLazy = new Lazy<IStrategySettings>(() =>
-            {
-                if (_settings == null)
-                {
-                    _settings = new StrategySettings();
-                }
-                return _settings;
-            });
         }
 
         public virtual bool IsCandidate(TModel model)
