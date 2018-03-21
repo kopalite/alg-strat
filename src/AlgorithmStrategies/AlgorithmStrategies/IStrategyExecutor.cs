@@ -2,8 +2,8 @@
 {
     public interface IStrategyExecutor<TModel, TResult>
     {
-        StrategyResult<TResult> Execute(TModel model);
+        AggregateResult<TResult> Execute(TModel model);
 
-        StrategyResult<TResult> Execute(TModel model, int strategyId);
+        AggregateResult<TResult> Execute(TModel model, int strategyId);
     }
 }

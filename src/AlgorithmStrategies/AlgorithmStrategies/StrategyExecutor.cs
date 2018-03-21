@@ -13,43 +13,46 @@ namespace AlgorithmStrategies
             _strategies = strategies;
         }
 
-        public StrategyResult<TResult> Execute(TModel model)
+        public AggregateResult<TResult> Execute(TModel model)
         {
             var strategies = _strategies.Where(x => x.IsActive).ToList();
-            return ByPriority(model, strategies, 0);
+            return Execute(model, strategies, 0);
         }
 
-        public StrategyResult<TResult> Execute(TModel model, int strategyId)
+        public AggregateResult<TResult> Execute(TModel model, int strategyId)
         {
             var strategies = _strategies.Where(x => x.IsActive).ToList();
-            return ByPriority(model, strategies, strategyId);
+            return Execute(model, strategies, strategyId);
         }
 
-        private StrategyResult<TResult> ByPriority(TModel model, List<IAlgorithmStrategy<TModel, TResult>> strategies, int strategyId)
+        private AggregateResult<TResult> Execute(TModel model, List<IAlgorithmStrategy<TModel, TResult>> strategies, int strategyId)
         {
             strategies = strategies.OrderBy(x => x.Priority).ToList();
 
-            var result = StrategyResult<TResult>.Inconclusive();
+            var finalResult = new AggregateResult<TResult>(ResultType.Inconclusive);
             IAlgorithmStrategy<TModel, TResult> strategy = null;
 
             do
             {
                 strategy = strategies.FirstOrDefault(x => x.Id == strategyId) ?? strategies.FirstOrDefault();
                 if (strategy != null)
-                { 
+                {
+                    var currentResult = StrategyResult<TResult>.Inconclusive();
                     if (strategy.IsCandidate(model))
                     {
-                        result.Sync(strategy.Execute(model));
+                        currentResult = strategy.Execute(model);
                     }
+                    currentResult.Strategy = strategy.Name;
+                    finalResult.Sync(currentResult);
+                    finalResult.Log(currentResult);
 
-                    result.Log(strategy.Name);
                     strategies.RemoveAll(s => s.Priority <= strategy.Priority);
                     strategyId = strategy.NextId;
                 }
             }
-            while (strategy != null && !strategy.IsTermination(result));
+            while (strategy != null && !strategy.IsTermination(finalResult));
 
-            return result;
+            return finalResult;
         }
     }
 }

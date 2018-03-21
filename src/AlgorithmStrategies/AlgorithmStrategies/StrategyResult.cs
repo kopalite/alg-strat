@@ -1,16 +1,21 @@
-﻿namespace AlgorithmStrategies
+﻿using System.Collections;
+using System.Linq;
+
+namespace AlgorithmStrategies
 {
     public class StrategyResult<TResult>
     {
+        
+
         public ResultType ResultType { get; private set; }
 
         public TResult Result { get; private set; }
 
-        public string History { get; private set; }
-
-        private StrategyResult(ResultType resultType) : this(resultType, default(TResult))
+        internal string Strategy { get; set; }
+        
+        protected StrategyResult(ResultType resultType) : this(resultType, default(TResult))
         {
-            
+
         }
 
         private StrategyResult(ResultType resultType, TResult result)
@@ -19,15 +24,16 @@
             Result = result;
         }
 
-        public void Sync(StrategyResult<TResult> result)
+        internal void Sync(StrategyResult<TResult> result)
         {
             ResultType = result.ResultType;
             Result = result.Result;
+            Strategy = result.Strategy;
         }
 
-        public void Log(string strategyName)
+        protected StrategyResult<TResult> Clone(StrategyResult<TResult> result)
         {
-            History = ((History ?? "") + ";" + strategyName).Trim(';'); 
+            return (StrategyResult<TResult>)result.MemberwiseClone();
         }
 
         public bool IsSuccess { get { return ResultType == ResultType.Success; } }
@@ -35,7 +41,7 @@
         public bool IsFailure { get { return ResultType == ResultType.Failure; } }
 
         public bool IsInconclusive { get { return ResultType == ResultType.Inconclusive; } }
-       
+
         public static StrategyResult<TResult> Success(TResult result = default(TResult))
         {
             return new StrategyResult<TResult>(ResultType.Success, result);
@@ -50,7 +56,5 @@
         {
             return new StrategyResult<TResult>(ResultType.Inconclusive, result);
         }
-
     }
-
 }

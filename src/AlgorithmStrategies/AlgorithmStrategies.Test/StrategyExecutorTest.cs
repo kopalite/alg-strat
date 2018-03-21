@@ -33,7 +33,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
+            Assert.IsTrue(result.Result && result.IsSuccess && result.StrategyHistory == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
         }
 
         [TestMethod]
@@ -46,7 +46,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(!result.Result && result.IsFailure && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
+            Assert.IsTrue(!result.Result && result.IsFailure && result.StrategyHistory == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(result.IsInconclusive && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
+            Assert.IsTrue(result.IsInconclusive && result.StrategyHistory == "IsNameUnderscoredAndDoctor;IsNameUnderscored;IsDoctor");
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
+            Assert.IsTrue(result.Result && result.IsSuccess && result.StrategyHistory == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
         }
 
         [TestMethod]
@@ -89,7 +89,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(!result.Result && result.IsFailure && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
+            Assert.IsTrue(!result.Result && result.IsFailure && result.StrategyHistory == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(!result.Result && result.IsInconclusive && result.History == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
+            Assert.IsTrue(!result.Result && result.IsInconclusive && result.StrategyHistory == "IsNameUnderscoredAndDoctor;IsNameUnderscoredTerminating");
         }
 
         [TestMethod]
@@ -117,7 +117,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 333);
 
             //Assert
-            Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsDoctor");
+            Assert.IsTrue(result.Result && result.IsSuccess && result.StrategyHistory == "IsDoctor");
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 222);
 
             //Assert
-            Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredChained;IsDoctor");
+            Assert.IsTrue(result.Result && result.IsSuccess && result.StrategyHistory == "IsNameUnderscoredChained;IsDoctor");
         }
 
         [TestMethod]
@@ -150,7 +150,7 @@ namespace AlgorithmStrategies.Test
             var result = _executor.Execute(userModel, 0);
 
             //Assert
-            Assert.IsTrue(result.Result && result.IsSuccess && result.History == "IsNameUnderscoredAndDoctorChained;IsDoctor;Default");
+            Assert.IsTrue(result.Result && result.IsSuccess && result.StrategyHistory == "IsNameUnderscoredAndDoctorChained;IsDoctor;Default");
         }
 
         [TestMethod]
@@ -165,7 +165,7 @@ namespace AlgorithmStrategies.Test
             var result = executor.Execute(new UserModel(), 0);
 
             //Assert
-            Assert.IsTrue(result.History == "DefaultTerminateNeverSuccess;DefaultTerminateAlways");
+            Assert.IsTrue(result.StrategyHistory == "DefaultTerminateNeverSuccess;DefaultTerminateAlways");
         }
 
         [TestMethod]
@@ -180,7 +180,7 @@ namespace AlgorithmStrategies.Test
             var result = executor.Execute(new UserModel(), 0);
 
             //Assert
-            Assert.IsTrue(result.History == "DefaultTerminateNeverFailure;DefaultTerminateAlways");
+            Assert.IsTrue(result.StrategyHistory == "DefaultTerminateNeverFailure;DefaultTerminateAlways");
         }
 
         [TestMethod]
@@ -195,7 +195,7 @@ namespace AlgorithmStrategies.Test
             var result = executor.Execute(new UserModel(), 0);
 
             //Assert
-            Assert.IsTrue(result.History == "DefaultTerminateNeverInconclusive;DefaultTerminateAlways");
+            Assert.IsTrue(result.StrategyHistory == "DefaultTerminateNeverInconclusive;DefaultTerminateAlways");
         }
 
         [TestMethod]
@@ -210,7 +210,7 @@ namespace AlgorithmStrategies.Test
             var result = executor.Execute(new UserModel(), 0);
 
             //Assert
-            Assert.IsTrue(result.History == "DefaultTerminateAlways");
+            Assert.IsTrue(result.StrategyHistory == "DefaultTerminateAlways");
         }
 
         [TestMethod]
@@ -225,7 +225,7 @@ namespace AlgorithmStrategies.Test
             var result = executor.Execute(new UserModel(), 0);
 
             //Assert
-            Assert.IsTrue(result.IsFailure && result.History == "DefaultTerminateOnFailure");
+            Assert.IsTrue(result.IsFailure && result.StrategyHistory == "DefaultTerminateOnFailure");
         }
 
         [TestMethod]
@@ -240,7 +240,7 @@ namespace AlgorithmStrategies.Test
             var result = executor.Execute(new UserModel(), 0);
 
             //Assert
-            Assert.IsTrue(result.IsSuccess && result.History == "DefaultTerminateOnSuccess");
+            Assert.IsTrue(result.IsSuccess && result.StrategyHistory == "DefaultTerminateOnSuccess");
         }
     }
 
